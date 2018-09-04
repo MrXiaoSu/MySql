@@ -1,0 +1,81 @@
+数据库SQL语句分类
+DDL（Data Definition Languages）语句：数据定义语言，这些语句定义了不同的数据段、数据库、表、列、索引等数据库对象的定义。常用的语句关键字主要包括create、drop、alter等。
+create database test1;
+show database;
+use database;
+show tables;
+drop database tset1;//dbname
+
+create table emp(
+	ename varchar(10),	//员工姓名
+	hiredate date,		//雇用时间
+	sal decimal(10,2),	//薪水
+	deptno int(2)	//部门编号
+);
+drop table emp;//删除表
+desc emp;//降序
+asc emp;//升序
+
+修改表：
+alter table emp modify ename varchar（20）;//修改表类型
+alter table emp add column age int(3);		//增加表字段
+alter table emp drop colum age;				//删除表字段
+alter table emp change age age_1 int(4);	//表字段改名改类型
+alter table emp add birth data after ename;	//修改字段排列顺序
+alter table emp modify age int(3) first;	//修改字段age，将它放在最前面
+alter table emp rename emp_1;				//修改表名
+
+DML（Data Manipulation Language）语句：数据操纵语句，用于添加、删除、更新和查询数据库记录，并检查数据完整性，常用的语句关键字主要包括insert、delete、udpate 和select 等。
+插入记录：
+insert into emp （ename，hiredata，sal,deptno） value （'xiaosu','2018-8-20','10000',1）;		//指定名称
+insert into emp	value （'xiaosu','2018-8-20','10000',1）;		//不指定名称，但是数据顺利必须与字段顺序一致
+更新记录：
+update emp set sal=12000 where ename = 'xiaosu';
+	对两个表数据同时进行更新
+create table dept（
+	deptno int（3）,		//部门编号
+	deptname varchar（10）//部门名
+）;
+update emp a,dept b	set a.sal = 20000,a.ename = 'xiaowang',b.deptname = 'yanfabu' where a.deptno = b.deptno;
+删除记录：
+delete from emp where ename = 'xiaosu';		//将emp表中ename为xiaosu的记录全部删除
+delete a,b from emp a,dept b where a.deptno=b.deptno and a.deptno=3;
+查询记录：
+select * from emp;				//查表
+select ename,hiredate,sal,deptno from emp;
+
+select distinct deptno from emp;		//查询不重复记录
+select * from emp where deptno = 1;		//查询部门编号为1的全部信息
+select * from emp order by sal;			//查询部门信息根据sal进行升序排列
+select * from emp order by sal limit 1,3;	//使用limit关键字来实现排序一部分记录，1代表起始偏移的位置，3代表显示的行数
+
+select count（1） from emp;								//统计总人数（有多少条记录）
+select deptno,count（1） from emp group by deptno;	//统计各部门人数
+select deptno,count（1） from emp group by deptno with rollup;	//既同居各部门人数，又统计总人数
+select deptno count（1） from emp group by deptno having count（1）>1;	//查找人数大于1的部门
+select sum（sal）,max（sal）,min（sal） from emp;			//统计所有人工资总和，找出最大最小值
+
+select ename,deptname from emp,dept where emp.deptno=dept.deptno;		//表连接，根据表之间某一个字段值的相等，来输出指定元素
+select ename,deptname from emp left join dept on emp.deptno=dept.deptno;	//左连接，根据左边的表来输出指定元素
+select ename,deptname from dept right join emp on dept.deptno=emp.deptno;	//右连接
+
+select * from emp where deptno in（select deptno from dept）;		//子查询，小圈找出值，大圈匹配  若子查询唯一，则可以用in代替=
+	//表联合，将两个表中提取的内容联合到一起
+	select deptno from emp
+	union all
+	select deptno from dept;
+	//表联合，去除重复部分	
+	select deptno from emp
+	union
+	select deptno from dept;
+
+DCL（Data Control Language）语句：数据控制语句，用于控制不同数据段直接的许可和访问级别的语句。这些语句定义了数据库、表、字段、用户的访问权限和安全级别。主要的语句关键字包括grant、revoke 等。
+grant select,insert on sakila.* to 'z1'@'localhost' identified by '123';  //具有对sakila数据库中所有表的select，insert权限
+revoke insert on on sakila.* to 'z1'@'localhost';		//收回对sakila的insert权限
+
+帮助文档
+？ contents			//可供查询的分类
+？ data types		//查询数据类型
+？ int				//int型具体介绍
+？ show 				//快速查阅帮助，查询命令
+？ create table		//查询建表
